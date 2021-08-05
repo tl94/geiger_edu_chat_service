@@ -6,19 +6,9 @@ const Room = require('../domain/room');
 const Message = require('../domain/message');
 const Image = require('../domain/image');
 
-const multer = require('multer');
 const fs = require('fs');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './images/')
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.filename)
-    }
-});
-const upload = multer({ storage: storage });
-
+const upload = require('../storage/storage');
 
 // needs uuid, name
 exports.createUser = async (req, res) => {
