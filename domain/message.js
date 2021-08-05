@@ -16,6 +16,11 @@ const messageSchema = new Schema({
     parentMsg: {
         type: mongoose.Types.ObjectId, ref: 'Message'
     },
+    childMsgs: [
+        {
+            type: mongoose.Types.ObjectId, ref: 'Message'
+        }
+    ],
     message: {
         type: String
     },

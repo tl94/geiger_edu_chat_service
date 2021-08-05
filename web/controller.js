@@ -34,6 +34,24 @@ exports.createUser = async (req, res) => {
     }
 }
 
+exports.getUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).exec();
+    if (!user) {
+        res.status(404);
+    }
+    res.send(user);
+}
+
+exports.getMessagesByUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).populate('messages').exec();
+    if (!user) {
+        res.status(404);
+    }
+    res.send(user.messages);
+}
+
 exports.findAllRooms = (req, res) => {
     Room.find((err, rooms) => {
         if (err) {
@@ -48,7 +66,6 @@ exports.findAllRooms = (req, res) => {
 
 // needs path parameter /rooms/:roomId
 exports.findRoomById = async (req, res) => {
-    console.log("HEWWO");
     const roomId = req.params.roomId;
     let room = await Room.findOne({ roomId: roomId }).exec();
     if (room === null) {
@@ -70,8 +87,6 @@ exports.getMessagesInRoom = async (req, res) => {
 // needs path parameter /rooms/:roomId/messages
 // needs Message with userId, roomId, message, isAnonymous
 exports.postMessageInRoom = async (req, res) => {
-    
-    console.log("HEWWO MESSAGES");
     const roomId = req.params.roomId;
     const message = new Message(req.body);
     message.timestamp = new Date();
@@ -92,8 +107,6 @@ exports.postMessageInRoom = async (req, res) => {
 // needs path parameter /rooms/:roomId/messages/:parentMsgId
 // needs Message with userId, roomId, message, isAnonymous
 exports.postReplyMessage = async (req, res) => {
-    
-    console.log("HEWWO MESSAGES 2");
     const roomId = req.params.roomId;
     const parentMsgId = req.params.parentMsgId;
     const message = new Message(req.body);
@@ -105,10 +118,16 @@ exports.postReplyMessage = async (req, res) => {
     const uuid = req.body.uuid;
     const user = await User.findOne({ uuid: uuid }).exec();
 
+    const parentMsg = await Message.findById(parentMsgId).exec();
+
     if (user) { 
         message.roomId = room._id;
         message.userId = user._id;
-        message.save((err, msg) => handleSavedMessage(req, res, room, user, err, msg)); 
+        message.save((err, msg) => {
+            handleSavedMessage(req, res, room, user, err, msg);
+            parentMsg.childMsgs.push(msg._id);
+            parentMsg.save();
+        }); 
     }}
 
 // needs path parameter /rooms/:roomId/pinnedMessages/:messageId

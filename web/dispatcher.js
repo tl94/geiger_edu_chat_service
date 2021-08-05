@@ -11,6 +11,10 @@ dispatcher.get('/', (req, res) => {
 
 dispatcher.post('/users', roomController.createUser);
 
+dispatcher.get('/users/:userId', roomController.getUser);
+
+dispatcher.get('/users/:userId/messages', roomController.getMessagesByUser);
+
 dispatcher.get('/rooms', roomController.findAllRooms);
 
 dispatcher.get('/rooms/:roomId', roomController.findRoomById);
