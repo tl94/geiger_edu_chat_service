@@ -27,7 +27,37 @@ dispatcher.post('/rooms/:roomId/messages/:parentMsgId', roomController.postReply
 
 dispatcher.post('/rooms/:roomId/pinnedMessages/:messageId', roomController.pinMessage);
 
-dispatcher.post('/rooms/:roomId/images', roomController.postImage);
+
+
+const Image = require('../domain/image');
+const fs = require('fs');
+var path = require('path');
+const upload = require('../storage/storage');
+dispatcher.post('/rooms/:roomId/images', upload.single('image'), (req, res, next) => {
+    
+    const roomId = req.params.roomId;
+
+    let imageDirectory = path.join('./images');
+
+    const image = {
+        img: {
+            data: fs.readFileSync(path.join(imageDirectory + '/' + req.file.filename)),
+            contentType: 'image/png'
+            // THIS CONTENT TYPE MIGHT CAUSE PROBLEMS 
+        }
+    }
+    console.log(image);
+
+    Image.create(image, async (err, item) => {
+        if (err) {
+            console.log(err);
+        } else {
+            item = await item.save();
+            res.status(201);
+            res.send(item._id);
+        }
+    });
+});
 
 dispatcher.delete('/messages/:messageId', roomController.deleteMessage);
 

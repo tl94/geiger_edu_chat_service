@@ -4,11 +4,8 @@ const mongoose = require('mongoose');
 const User = require('../domain/user');
 const Room = require('../domain/room');
 const Message = require('../domain/message');
-const Image = require('../domain/image');
 
-const fs = require('fs');
 
-const upload = require('../storage/storage');
 
 // needs name
 exports.createUser = async (req, res) => {
@@ -140,25 +137,7 @@ exports.pinMessage = async (req, res) => {
 }
 
 // needs path parameter /rooms/:roomId/images
-exports.postImage = upload.single('image'), (req, res) => {
-    const roomId = req.params.roomId;
-    const image = {
-        img: {
-            data: fs.readFileSync(path.join(__dirname + '/' + roomId + '/' + req.file.filename)),
-            contentType: 'image/png'
-            // THIS CONTENT TYPE MIGHT CAUSE PROBLEMS 
-        }
-    }
-    Image.create(image, async (err, item) => {
-        if (err) {
-            console.log(err);
-        } else {
-            item = await item.save();
-            res.status(201);
-            res.send(item._id);
-        }
-    });
-}
+exports.postImage;
 
 // needs path parameter /messages/:messageId
 exports.deleteMessage = (req, res) => {

@@ -12,6 +12,7 @@ const port = process.env.SERVER_PORT;
 
 // load middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // define main route
