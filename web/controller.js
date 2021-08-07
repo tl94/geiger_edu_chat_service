@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const User = require('../domain/user');
 const Room = require('../domain/room');
 const Message = require('../domain/message');
-
+const Image = require('../domain/image');
 
 
 // needs name
@@ -64,7 +64,9 @@ exports.findRoomById = async (req, res) => {
 exports.getMessagesInRoom = async (req, res) => {
     const roomId = req.params.roomId;
     let room = await Room.findOne({ roomId: roomId }).populate('messages').exec();
-    const messages = room.messages;
+
+    let messages = room.messages;
+
     res.send(messages);
 }
 
@@ -72,22 +74,34 @@ exports.getMessagesInRoom = async (req, res) => {
 // needs Message with userId, roomId, message, isAnonymous
 exports.postMessageInRoom = async (req, res) => {
     const roomId = req.params.roomId;
-    const message = new Message(req.body);
+
     // message.timestamp = new Date();
+
+    const userId = mongoose.Types.ObjectId(req.body.userId);
     
-    console.log(req.body);
-    console.log(message);
+    let imageId = null;
+    if (req.body.imageId) {
+        imageId = req.body.imageId.split('"')[1];
+
+        imageId = mongoose.Types.ObjectId(imageId);
+    }
+
     const room = await checkOrCreateRoom(roomId);
-    
+
 
     // TODO: get userId on creation or some kind of token to identify them
-    const user = await User.findById(message.userId).exec();
+    const user = await User.findById(userId).exec();
 
-    console.log(user);
-    if (user) { 
-        message.roomId = room._id;
+
+    req.body.roomId = room.roomId;
+    req.body.imageId = imageId;
+
+    const message = new Message(req.body);
+
+    if (user) {
+        message.roomId = room.roomId;
         message.userId = user._id;
-        message.save((err, msg) => handleSavedMessage(req, res, room, user, err, msg)); 
+        message.save((err, msg) => handleSavedMessage(req, res, room, user, err, msg));
     }
 }
 
@@ -107,15 +121,16 @@ exports.postReplyMessage = async (req, res) => {
 
     const parentMsg = await Message.findById(parentMsgId).exec();
 
-    if (user) { 
-        message.roomId = room._id;
+    if (user) {
+        message.roomId = room.roomId;
         message.userId = user._id;
         message.save((err, msg) => {
             handleSavedMessage(req, res, room, user, err, msg);
             parentMsg.childMsgs.push(msg._id);
             parentMsg.save();
-        }); 
-    }}
+        });
+    }
+}
 
 // needs path parameter /rooms/:roomId/pinnedMessages/:messageId
 exports.pinMessage = async (req, res) => {
@@ -162,6 +177,18 @@ exports.deleteMessage = (req, res) => {
     })
 }
 
+exports.getImage = async (req, res) => {
+
+    const imageId = req.params.imageId;
+    const image = await Image.findById(imageId).exec();
+    if (image) {
+        res.send(image);
+    } else {
+        res.status(404);
+        res.send();
+    }
+}
+
 
 // helper methods
 
@@ -169,7 +196,7 @@ const checkOrCreateRoom = async roomId => {
     let room = await Room.findOne({ roomId: roomId }).exec();
     if (!room) {
         // create room
-        room.roomId = id;
+        room.roomId = roomId;
         // room.roomName = id;
         room.users = [];
         room.messages = [];
@@ -205,6 +232,5 @@ const handleSavedMessage = (req, res, room, user, err, msg) => {
 
         res.status(201)
         res.send(msg);
-        console.log(msg);
     }
 }

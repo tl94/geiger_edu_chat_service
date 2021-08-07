@@ -61,5 +61,6 @@ dispatcher.post('/rooms/:roomId/images', upload.single('image'), (req, res, next
 
 dispatcher.delete('/messages/:messageId', roomController.deleteMessage);
 
+dispatcher.get('/images/:imageId', roomController.getImage);
 
 module.exports = dispatcher;

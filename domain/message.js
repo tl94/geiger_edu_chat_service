@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
  */
 const messageSchema = new Schema({
     roomId: {
-        type: mongoose.Types.ObjectId, ref: 'Room'
+        type: String
     },
     userId: {
         type: mongoose.Types.ObjectId, ref: 'User'
