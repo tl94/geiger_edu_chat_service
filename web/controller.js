@@ -10,20 +10,15 @@ const fs = require('fs');
 
 const upload = require('../storage/storage');
 
-// needs uuid, name
+// needs name
 exports.createUser = async (req, res) => {
     let user = new User(req.body);
-    const userInDb = await User.findOne({ uuid: user.uuid });
-    if (!userInDb) {
-        user = await user.save();
-        res.status(201);
-        res.send(user);
-    } else {
-        res.send(200);
-        res.send(userInDb);
-    }
+    user = await user.save();
+    res.status(201);
+    res.send(user._id);
 }
 
+// get user by _id
 exports.getUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId).exec();
@@ -33,6 +28,7 @@ exports.getUser = async (req, res) => {
     res.send(user);
 }
 
+// needs path parameter /users/:userId/messages
 exports.getMessagesByUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId).populate('messages').exec();
@@ -42,6 +38,7 @@ exports.getMessagesByUser = async (req, res) => {
     res.send(user.messages);
 }
 
+// path /rooms
 exports.findAllRooms = (req, res) => {
     Room.find((err, rooms) => {
         if (err) {
@@ -79,14 +76,17 @@ exports.getMessagesInRoom = async (req, res) => {
 exports.postMessageInRoom = async (req, res) => {
     const roomId = req.params.roomId;
     const message = new Message(req.body);
-    message.timestamp = new Date();
-
+    // message.timestamp = new Date();
+    
+    console.log(req.body);
+    console.log(message);
     const room = await checkOrCreateRoom(roomId);
+    
 
     // TODO: get userId on creation or some kind of token to identify them
-    const uuid = req.body.uuid;
-    const user = await User.findOne({ uuid: uuid }).exec();
+    const user = await User.findById(message.userId).exec();
 
+    console.log(user);
     if (user) { 
         message.roomId = room._id;
         message.userId = user._id;
@@ -212,7 +212,10 @@ const handleSavedMessage = (req, res, room, user, err, msg) => {
     if (err) {
         res.status(500);
         res.send(err);
+        console.log(err);
     } else {
+        msg.roomId = room.roomId;
+
         let msgs = room.messages;
         msgs.push(msg._id);
         room.save();
@@ -223,5 +226,6 @@ const handleSavedMessage = (req, res, room, user, err, msg) => {
 
         res.status(201)
         res.send(msg);
+        console.log(msg);
     }
 }

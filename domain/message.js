@@ -27,9 +27,6 @@ const messageSchema = new Schema({
     timestamp: {
         type: Date
     },
-    isAnonymous: {
-        type: Boolean
-    },
     imageId: {
         type: mongoose.Types.ObjectId, ref: 'Image'
     }
