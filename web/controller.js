@@ -15,14 +15,39 @@ exports.createUser = async (req, res) => {
     res.send(user._id);
 }
 
-// get user by _id
+/**
+ * Gets user data for userId.
+ * @param {*} req request object
+ * @param {*} res response object
+ */
 exports.getUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId).exec();
     if (!user) {
         res.status(404);
     }
+    if (user.isAnonymous) {
+        user.name = 'Anonymous';
+    }
+    user.messages = null;
     res.send(user);
+}
+
+exports.updateUser = async (req, res) => {
+    const userId = req.params.userId;
+    let oldUser = await User.findById(userId).exec();
+    const newUser = User(req.body);
+    if (!newUser) {
+        res.status(404);
+    }
+    
+    oldUser.name = newUser.name;
+    oldUser.profileImage = newUser.profileImage;
+    oldUser.learnScore = newUser.learnScore;
+    oldUser.isAnonymous = newUser.isAnonymous;
+    oldUser.showLearnScore = newUser.showLearnScore;
+    await oldUser.save();
+    res.send();
 }
 
 // needs path parameter /users/:userId/messages
@@ -31,8 +56,10 @@ exports.getMessagesByUser = async (req, res) => {
     const user = await User.findById(userId).populate('messages').exec();
     if (!user) {
         res.status(404);
+        res.send();
+    } else {
+        res.send(user.messages);
     }
-    res.send(user.messages);
 }
 
 // path /rooms
@@ -63,7 +90,10 @@ exports.findRoomById = async (req, res) => {
 // needs path parameter /rooms/:roomId/messages
 exports.getMessagesInRoom = async (req, res) => {
     const roomId = req.params.roomId;
-    let room = await Room.findOne({ roomId: roomId }).populate('messages').exec();
+
+    console.log(roomId);
+
+    const room = await checkOrCreateRoom(roomId);
 
     let messages = room.messages;
 
@@ -169,7 +199,7 @@ exports.deleteMessage = (req, res) => {
                     res.status(500)
                     res.send(err);
                 } else {
-                    res.status(204);
+                    res.status(200);
                     res.send();
                 }
             })
@@ -193,8 +223,9 @@ exports.getImage = async (req, res) => {
 // helper methods
 
 const checkOrCreateRoom = async roomId => {
-    let room = await Room.findOne({ roomId: roomId }).exec();
+    let room = await Room.findOne({ roomId: roomId }).populate('messages').exec();
     if (!room) {
+        room = Room();
         // create room
         room.roomId = roomId;
         // room.roomName = id;

@@ -13,6 +13,8 @@ dispatcher.post('/users', roomController.createUser);
 
 dispatcher.get('/users/:userId', roomController.getUser);
 
+dispatcher.put('/users/:userId', roomController.updateUser);
+
 dispatcher.get('/users/:userId/messages', roomController.getMessagesByUser);
 
 dispatcher.get('/rooms', roomController.findAllRooms);
