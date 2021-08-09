@@ -35,7 +35,7 @@ exports.getUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const userId = req.params.userId;
-    let oldUser = await User.findById(userId).exec();
+        let oldUser = await User.findById(userId).exec();
     const newUser = User(req.body);
     if (!newUser) {
         res.status(404);
@@ -90,8 +90,6 @@ exports.findRoomById = async (req, res) => {
 // needs path parameter /rooms/:roomId/messages
 exports.getMessagesInRoom = async (req, res) => {
     const roomId = req.params.roomId;
-
-    console.log(roomId);
 
     const room = await checkOrCreateRoom(roomId);
 
