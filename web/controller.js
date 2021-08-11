@@ -35,6 +35,7 @@ exports.getUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const userId = req.params.userId;
+    console.log(userId);
         let oldUser = await User.findById(userId).exec();
     const newUser = User(req.body);
     if (!newUser) {
