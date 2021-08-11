@@ -6,7 +6,6 @@ const roomController = require('./controller');
 // define endpoints
 dispatcher.get('/', (req, res) => {
     res.send("Hello World!");
-    logger.debug("Successful GET request on main endpoint /")
 });
 
 dispatcher.post('/users', roomController.createUser);
