@@ -1,3 +1,7 @@
+/* 
+* class that uses log4js package to log relevant events in the application
+* UNUSED 
+*/
 const log4js = require("log4js");
 
 log4js.configure({

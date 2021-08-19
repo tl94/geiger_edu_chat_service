@@ -1,3 +1,6 @@
+/* 
+* main entrypoint of the application 
+*/
 require('dotenv-extended').load();
 require('./db/db');
 const express = require('express');

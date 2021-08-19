@@ -1,3 +1,6 @@
+/* 
+* class that uses multer package to create and export image storage and upload functionality 
+*/
 const multer = require('multer');
 
 const storage = multer.diskStorage({

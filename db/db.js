@@ -1,9 +1,10 @@
-// MongoDB connection setup with mongoose
-
+/* 
+* class that uses mongoose package to create MongoDB connection 
+*/
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-const url = 'mongodb://'+process.env.MONGO_HOST+'/'+process.env.MONGO_DATABASE;
+const url = 'mongodb://' + process.env.MONGO_HOST + '/' + process.env.MONGO_DATABASE;
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;

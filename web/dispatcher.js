@@ -1,9 +1,14 @@
+/* 
+* class that uses express package to handle routing
+*/
 const express = require('express');
 const dispatcher = express.Router();
 
 const roomController = require('./controller');
 
-// define endpoints
+
+// define REST endpoints
+
 dispatcher.get('/', (req, res) => {
     res.send("Hello World!");
 });
@@ -62,5 +67,7 @@ dispatcher.post('/rooms/:roomId/images', upload.single('image'), (req, res, next
 dispatcher.delete('/messages/:messageId', roomController.deleteMessage);
 
 dispatcher.get('/images/:imageId', roomController.getImage);
+
+
 
 module.exports = dispatcher;
