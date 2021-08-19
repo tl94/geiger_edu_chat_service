@@ -44,7 +44,6 @@ dispatcher.post('/rooms/:roomId/images', upload.single('image'), (req, res, next
         img: {
             data: fs.readFileSync(path.join(imageDirectory + '/' + req.file.filename)),
             contentType: 'image/png'
-            // THIS CONTENT TYPE MIGHT CAUSE PROBLEMS 
         }
     }
     console.log(image);

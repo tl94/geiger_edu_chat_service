@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
-// db model
+// db models, used for all operations on DB
 const User = require('../domain/user');
 const Room = require('../domain/room');
 const Message = require('../domain/message');
 const Image = require('../domain/image');
 
 
-// needs name
+// create User using User request body with name property
 exports.createUser = async (req, res) => {
     let user = new User(req.body);
     user = await user.save();
@@ -15,11 +15,8 @@ exports.createUser = async (req, res) => {
     res.send(user._id);
 }
 
-/**
- * Gets user data for userId.
- * @param {*} req request object
- * @param {*} res response object
- */
+
+// get User using path parameter userId in path /users/:userId/, if the User exists
 exports.getUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId).exec();
@@ -33,25 +30,27 @@ exports.getUser = async (req, res) => {
     res.send(user);
 }
 
+// update User using path parameter userId in path /users/:userId/ and new User data in request body
 exports.updateUser = async (req, res) => {
     const userId = req.params.userId;
-    console.log(userId);
-        let oldUser = await User.findById(userId).exec();
+
+    let oldUser = await User.findById(userId).exec();
     const newUser = User(req.body);
     if (!newUser) {
         res.status(404);
+    } else {
+        oldUser.name = newUser.name;
+        oldUser.profileImage = newUser.profileImage;
+        oldUser.learnScore = newUser.learnScore;
+        oldUser.isAnonymous = newUser.isAnonymous;
+        oldUser.showLearnScore = newUser.showLearnScore;
+
+        await oldUser.save();
     }
-    
-    oldUser.name = newUser.name;
-    oldUser.profileImage = newUser.profileImage;
-    oldUser.learnScore = newUser.learnScore;
-    oldUser.isAnonymous = newUser.isAnonymous;
-    oldUser.showLearnScore = newUser.showLearnScore;
-    await oldUser.save();
     res.send();
 }
 
-// needs path parameter /users/:userId/messages
+// get Messages by user using path parameter userId in /users/:userId/messages
 exports.getMessagesByUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId).populate('messages').exec();
@@ -63,7 +62,7 @@ exports.getMessagesByUser = async (req, res) => {
     }
 }
 
-// path /rooms
+// get all Rooms
 exports.findAllRooms = (req, res) => {
     Room.find((err, rooms) => {
         if (err) {
@@ -76,7 +75,7 @@ exports.findAllRooms = (req, res) => {
     });
 };
 
-// needs path parameter /rooms/:roomId
+// get Room using path parameter roomId in /rooms/:roomId
 exports.findRoomById = async (req, res) => {
     const roomId = req.params.roomId;
     let room = await Room.findOne({ roomId: roomId }).exec();
@@ -88,7 +87,7 @@ exports.findRoomById = async (req, res) => {
     res.send(room);
 }
 
-// needs path parameter /rooms/:roomId/messages
+// get Messages in Room using path parameter roomId in /rooms/:roomId/messages
 exports.getMessagesInRoom = async (req, res) => {
     const roomId = req.params.roomId;
 
@@ -99,15 +98,16 @@ exports.getMessagesInRoom = async (req, res) => {
     res.send(messages);
 }
 
-// needs path parameter /rooms/:roomId/messages
-// needs Message with userId, roomId, message, isAnonymous
+
+// post Message in Room using path parameter roomId in /rooms/:roomId/messages
+// and Message request body with userId, roomId, message
 exports.postMessageInRoom = async (req, res) => {
     const roomId = req.params.roomId;
 
-    // message.timestamp = new Date();
+    message.timestamp = new Date();
 
     const userId = mongoose.Types.ObjectId(req.body.userId);
-    
+
     let imageId = null;
     if (req.body.imageId) {
         imageId = req.body.imageId.split('"')[1];
@@ -117,8 +117,6 @@ exports.postMessageInRoom = async (req, res) => {
 
     const room = await checkOrCreateRoom(roomId);
 
-
-    // TODO: get userId on creation or some kind of token to identify them
     const user = await User.findById(userId).exec();
 
 
@@ -134,11 +132,12 @@ exports.postMessageInRoom = async (req, res) => {
     }
 }
 
-// needs path parameter /rooms/:roomId/messages/:parentMsgId
-// needs Message with userId, roomId, message, isAnonymous
+// post reply Message for Message in Room using path parameters roomId, parentMsgId in /rooms/:roomId/messages/:parentMsgId
+// and Message request body with userId, roomId, message
 exports.postReplyMessage = async (req, res) => {
     const roomId = req.params.roomId;
     const parentMsgId = req.params.parentMsgId;
+    
     const message = new Message(req.body);
     message.parentMsg = parentMsgId;
     message.timestamp = new Date();
@@ -161,7 +160,7 @@ exports.postReplyMessage = async (req, res) => {
     }
 }
 
-// needs path parameter /rooms/:roomId/pinnedMessages/:messageId
+// pin Message in Room using path parameters roomId, messageId in /rooms/:roomId/pinnedMessages/:messageId
 exports.pinMessage = async (req, res) => {
     const roomId = req.params.roomId;
     const messageId = req.params.messageId;
@@ -180,10 +179,11 @@ exports.pinMessage = async (req, res) => {
     });
 }
 
-// needs path parameter /rooms/:roomId/images
+
+// UNUSED
 exports.postImage;
 
-// needs path parameter /messages/:messageId
+// delete Message using path parameter messageId in path /messages/:messageId
 exports.deleteMessage = (req, res) => {
     const messageId = req.params.messageId;
     Message.findById(messageId, (err, msg) => {
@@ -206,8 +206,8 @@ exports.deleteMessage = (req, res) => {
     })
 }
 
+// get Image using path parameter imageId in path /images/:imageId
 exports.getImage = async (req, res) => {
-
     const imageId = req.params.imageId;
     const image = await Image.findById(imageId).exec();
     if (image) {
@@ -220,7 +220,7 @@ exports.getImage = async (req, res) => {
 
 
 // helper methods
-
+// check if Room with roomId exists, create it if not, return Room
 const checkOrCreateRoom = async roomId => {
     let room = await Room.findOne({ roomId: roomId }).populate('messages').exec();
     if (!room) {
@@ -236,6 +236,7 @@ const checkOrCreateRoom = async roomId => {
     return room;
 }
 
+// UNUSED
 const checkUser = async uuid => {
     let user = await User.findOne({ uuid: uuid }).exec();
     if (!user) {
@@ -244,6 +245,7 @@ const checkUser = async uuid => {
     return true;
 }
 
+// save new Message and add to particular Room and User
 const handleSavedMessage = (req, res, room, user, err, msg) => {
     if (err) {
         res.status(500);
