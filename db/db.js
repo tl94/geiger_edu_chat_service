@@ -1,6 +1,10 @@
-/* 
-* class that uses mongoose package to create MongoDB connection 
-*/
+/**
+ * uses mongoose package to create MongoDB connection.
+ *
+ * @author Turan Ledermann
+ * @author Felix Mayer
+ **/
+
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 

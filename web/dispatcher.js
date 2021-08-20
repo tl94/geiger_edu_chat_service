@@ -1,6 +1,10 @@
-/* 
-* class that uses express package to handle routing
-*/
+/**
+ * uses express package to handle routing.
+ *
+ * @author Turan Ledermann
+ * @author Felix Mayer
+ **/
+
 const express = require('express');
 const dispatcher = express.Router();
 

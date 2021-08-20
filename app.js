@@ -1,6 +1,10 @@
-/* 
-* main entrypoint of the application 
-*/
+/**
+ * main entrypoint of the application.
+ *
+ * @author Turan Ledermann
+ * @author Felix Mayer
+**/
+
 require('dotenv-extended').load();
 require('./db/db');
 const express = require('express');

@@ -1,7 +1,10 @@
-/* 
-* class that uses log4js package to log relevant events in the application
-* UNUSED 
-*/
+/**
+ * UNUSED
+ * The following implementation has been integrated from
+ * https://github.com/log4js-node/log4js-node/blob/master/docs/file.md
+ * Credit to: the log4js-node developers
+ * */
+
 const log4js = require("log4js");
 
 log4js.configure({

@@ -1,6 +1,10 @@
-/* 
-* class that implements request and response handling and relevant DB operations  
-*/
+/**
+ * implements request and response handling and relevant DB operations.
+ *
+ * @author Turan Ledermann
+ * @author Felix Mayer
+ **/
+
 const mongoose = require('mongoose');
 
 // db models, used for all operations on DB

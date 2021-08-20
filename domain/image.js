@@ -1,11 +1,15 @@
+/**
+ * defines the database schema for entity 'Image'.
+ *
+ * @author Turan Ledermann
+ * @author Felix Mayer
+ **/
+
 "use strict";
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-/*
- * Define the database schema for entity 'Image'.
- */
 const imageSchema = new Schema({
     img:
     {
