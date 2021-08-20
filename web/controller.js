@@ -92,6 +92,7 @@ exports.findRoomById = async (req, res) => {
 
 // get Messages in Room using path parameter roomId in /rooms/:roomId/messages
 exports.getMessagesInRoom = async (req, res) => {
+    console.log("GET MESSAGES!")
     const roomId = req.params.roomId;
 
     const room = await checkOrCreateRoom(roomId);
@@ -106,8 +107,6 @@ exports.getMessagesInRoom = async (req, res) => {
 // and Message request body with userId, roomId, message
 exports.postMessageInRoom = async (req, res) => {
     const roomId = req.params.roomId;
-
-    message.timestamp = new Date();
 
     const userId = mongoose.Types.ObjectId(req.body.userId);
 
@@ -127,6 +126,8 @@ exports.postMessageInRoom = async (req, res) => {
     req.body.imageId = imageId;
 
     const message = new Message(req.body);
+
+    message.timestamp = new Date();
 
     if (user) {
         message.roomId = room.roomId;
