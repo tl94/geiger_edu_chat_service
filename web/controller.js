@@ -97,12 +97,13 @@ exports.findRoomById = async (req, res) => {
 // get Messages in Room using path parameter roomId in /rooms/:roomId/messages
 exports.getMessagesInRoom = async (req, res) => {
     const roomId = req.params.roomId;
-    const dateFrom = req.query.dateFrom;
+    let dateFrom = req.query.dateFrom;
 
     const room = await checkOrCreateRoom(roomId);
 
     let messages = room.messages;
     if (dateFrom) {
+        dateFrom = Date.parse(dateFrom);
         messages = messages.filter(m => m.timestamp > dateFrom);
     }
 
