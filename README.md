@@ -4,6 +4,7 @@ Messages and images can be accessed or posted via various endpoints. which are t
 
 # Requirements
 npm (version used: 6.14.11)
+
 MongoDB
 
 # Project Setup
